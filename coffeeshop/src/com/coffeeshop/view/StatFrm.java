@@ -8,6 +8,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,7 +20,8 @@ import java.util.List;
  */
 public class StatFrm extends JFrame implements ActionListener {
 
-    private JTextField txtProductSearch, txtFromDate, txtToDate;
+    private JTextField txtProductSearch;
+    private JSpinner spinFromDate, spinToDate;
     private JComboBox<String> cmbTimeFilter;
     private JButton btnFilter, btnBack;
     private JTable tblStat;
@@ -53,20 +58,25 @@ public class StatFrm extends JFrame implements ActionListener {
         cmbTimeFilter = new JComboBox<>(new String[]{"Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Tùy chỉnh"});
         cmbTimeFilter.addActionListener(e -> {
             boolean isCustom = "Tùy chỉnh".equals(cmbTimeFilter.getSelectedItem());
-            txtFromDate.setEnabled(isCustom);
-            txtToDate.setEnabled(isCustom);
+            spinFromDate.setEnabled(isCustom);
+            spinToDate.setEnabled(isCustom);
+            if (btnFilter != null) {
+                btnFilter.doClick();
+            }
         });
         searchPanel.add(cmbTimeFilter);
 
         searchPanel.add(new JLabel("Từ:"));
-        txtFromDate = new JTextField(8);
-        txtFromDate.setEnabled(false);
-        searchPanel.add(txtFromDate);
+        spinFromDate = new JSpinner(new SpinnerDateModel());
+        spinFromDate.setEditor(new JSpinner.DateEditor(spinFromDate, "yyyy-MM-dd"));
+        spinFromDate.setEnabled(false);
+        searchPanel.add(spinFromDate);
         
         searchPanel.add(new JLabel("Đến:"));
-        txtToDate = new JTextField(8);
-        txtToDate.setEnabled(false);
-        searchPanel.add(txtToDate);
+        spinToDate = new JSpinner(new SpinnerDateModel());
+        spinToDate.setEditor(new JSpinner.DateEditor(spinToDate, "yyyy-MM-dd"));
+        spinToDate.setEnabled(false);
+        searchPanel.add(spinToDate);
 
         searchPanel.add(new JLabel("Tên món:"));
         txtProductSearch = new JTextField(10);
@@ -90,6 +100,37 @@ public class StatFrm extends JFrame implements ActionListener {
         };
         tblStat = new JTable(tableModel);
         tblStat.setRowHeight(28);
+        tblStat.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int row = tblStat.getSelectedRow();
+                    if (row != -1) {
+                        String productName = (String) tblStat.getValueAt(row, 1);
+                        String from = "", to = "";
+                        if ("Tùy chỉnh".equals(cmbTimeFilter.getSelectedItem())) {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            from = sdf.format((Date) spinFromDate.getValue());
+                            to = sdf.format((Date) spinToDate.getValue());
+                        } else {
+                            String filter = (String) cmbTimeFilter.getSelectedItem();
+                            java.time.LocalDate today = java.time.LocalDate.now();
+                            if ("Hôm nay".equals(filter)) {
+                                from = today.toString();
+                                to = today.toString();
+                            } else if ("Tuần này".equals(filter)) {
+                                from = today.minusDays(today.getDayOfWeek().getValue() - 1).toString();
+                                to = today.plusDays(7 - today.getDayOfWeek().getValue()).toString();
+                            } else if ("Tháng này".equals(filter)) {
+                                from = today.withDayOfMonth(1).toString();
+                                to = today.withDayOfMonth(today.lengthOfMonth()).toString();
+                            }
+                        }
+                        new StatDetailFrm(currentAdmin, productName, from, to).setVisible(true);
+                    }
+                }
+            }
+        });
         mainPanel.add(new JScrollPane(tblStat), BorderLayout.CENTER);
 
         // Footer
@@ -159,8 +200,9 @@ public class StatFrm extends JFrame implements ActionListener {
                 from = today.withDayOfMonth(1).toString();
                 to = today.withDayOfMonth(today.lengthOfMonth()).toString();
             } else if ("Tùy chỉnh".equals(filter)) {
-                from = txtFromDate.getText().trim();
-                to = txtToDate.getText().trim();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                from = sdf.format((Date) spinFromDate.getValue());
+                to = sdf.format((Date) spinToDate.getValue());
             }
             
             loadStatData(kw, from, to);

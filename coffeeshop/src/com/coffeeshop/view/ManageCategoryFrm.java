@@ -61,7 +61,7 @@ public class ManageCategoryFrm extends JFrame implements ActionListener {
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
         // Table
-        String[] columns = {"Tên danh mục", "Mô tả"};
+        String[] columns = {"STT", "ID", "Tên danh mục", "Mô tả"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -95,8 +95,11 @@ public class ManageCategoryFrm extends JFrame implements ActionListener {
 
     private void updateTable() {
         tableModel.setRowCount(0);
+        int stt = 1;
         for (Categories c : categoryList) {
             tableModel.addRow(new Object[]{
+                stt++,
+                c.getId(),
                 c.getName(),
                 c.getDescription()
             });

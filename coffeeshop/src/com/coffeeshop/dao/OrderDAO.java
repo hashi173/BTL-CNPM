@@ -324,4 +324,49 @@ public class OrderDAO extends DAO {
         o.setUpdatedAt(rs.getTimestamp("updated_at"));
         return o;
     }
+
+    public List<Object[]> getOrderDetailsByProductAndTime(String productName, String fromDate, String toDate) {
+        List<Object[]> list = new ArrayList<>();
+        String sql = "SELECT o.tracking_code, o.customer_name, o.phone, o.total_amount, o.status, o.created_at, oi.quantity " +
+                     "FROM orders o JOIN order_items oi ON o.id = oi.order_id " +
+                     "WHERE o.status IN ('COMPLETED', 'DELIVERED') AND LOWER(oi.snapshot_product_name) = LOWER(?) ";
+        
+        if (fromDate != null && !fromDate.trim().isEmpty()) {
+            sql += "AND o.created_at >= ?::timestamp ";
+        }
+        if (toDate != null && !toDate.trim().isEmpty()) {
+            sql += "AND o.created_at <= (?::timestamp + interval '1 day') ";
+        }
+        sql += "ORDER BY o.created_at DESC";
+
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            int pIndex = 1;
+            ps.setString(pIndex++, productName);
+            
+            if (fromDate != null && !fromDate.trim().isEmpty()) {
+                ps.setString(pIndex++, fromDate.trim());
+            }
+            if (toDate != null && !toDate.trim().isEmpty()) {
+                ps.setString(pIndex++, toDate.trim());
+            }
+            
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Object[] row = new Object[7];
+                row[0] = rs.getString("tracking_code");
+                row[1] = rs.getString("customer_name");
+                row[2] = rs.getString("phone");
+                row[3] = rs.getDouble("total_amount");
+                row[4] = rs.getString("status");
+                row[5] = rs.getTimestamp("created_at");
+                row[6] = rs.getInt("quantity");
+                list.add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

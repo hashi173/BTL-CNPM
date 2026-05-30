@@ -62,7 +62,7 @@ public class ManageProductFrm extends JFrame implements ActionListener {
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
         // Table
-        String[] columns = {"Tên sản phẩm", "Danh mục", "Giá", "Trạng thái"};
+        String[] columns = {"STT", "ID", "Tên sản phẩm", "Danh mục", "Giá", "Trạng thái"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -105,8 +105,11 @@ public class ManageProductFrm extends JFrame implements ActionListener {
 
     private void updateTable() {
         tableModel.setRowCount(0);
+        int stt = 1;
         for (Products p : productList) {
             tableModel.addRow(new Object[] {
+                    stt++,
+                    p.getId() != null ? p.getId().toString() : "",
                     p.getName(),
                     p.getCategoryName() != null ? p.getCategoryName() : "",
                     String.format("%,.0f", p.getBasePrice()),

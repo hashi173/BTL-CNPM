@@ -62,7 +62,7 @@ public class OrderManagementFrm extends JFrame implements ActionListener {
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
         // Table
-        String[] columns = {"STT", "Mã đơn hàng", "Khách hàng", "Ngày đặt", "Tổng tiền", "Trạng thái"};
+        String[] columns = {"STT", "ID (Hệ thống)", "Mã đơn hàng", "Khách hàng", "Ngày đặt", "Tổng tiền", "Trạng thái"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -96,6 +96,7 @@ public class OrderManagementFrm extends JFrame implements ActionListener {
         for (Orders o : orderList) {
             tableModel.addRow(new Object[]{
                 stt++,
+                o.getId() != null ? o.getId().toString() : "",
                 o.getTrackingCode(),
                 o.getCustomerName() + " - " + o.getPhone(),
                 o.getCreatedAt() != null ? sdf.format(o.getCreatedAt()) : "",
