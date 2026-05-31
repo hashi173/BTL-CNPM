@@ -11,6 +11,10 @@ import java.util.UUID;
 /**
  * cart_DAO - Quản lý giỏ hàng (persist vào CSDL).
  * Kế thừa từ lớp DAO.
+ * 
+ * [CNPM] Use Case: Quản lý giỏ hàng & Đặt hàng
+ * Phụ trách: Thi
+ * Mô tả: DAO xử lý thêm/sửa/xóa sản phẩm trong giỏ hàng và tính tổng tiền giỏ hàng.
  */
 public class CartDAO extends DAO {
 
@@ -18,7 +22,7 @@ public class CartDAO extends DAO {
 
     /**
      * Thêm mặt hàng vào giỏ hàng.
-     * addCartItem() - được gọi từ ProductDetailFrm.
+     * addCartItem() - được gọi từ ProductDetailView.
      * Nếu đã có sản phẩm giống (cùng product + tùy chọn), tăng số lượng.
      */
     public void addCartItem(CartItems newItem, UUID userId) {
@@ -50,7 +54,7 @@ public class CartDAO extends DAO {
 
     /**
      * Lấy danh sách tất cả mặt hàng trong giỏ của user.
-     * getAllCart() - được gọi từ CartFrm và CheckoutFrm.
+     * getAllCart() - được gọi từ CartView và CheckoutView.
      */
     public List<CartItems> getAllCart(UUID userId) {
         List<CartItems> list = new ArrayList<>();
@@ -94,7 +98,7 @@ public class CartDAO extends DAO {
 
     /**
      * Xóa một mặt hàng khỏi giỏ.
-     * removeCartItem() - được gọi từ CartFrm.
+     * removeCartItem() - được gọi từ CartView.
      */
     public void removeCartItem(UUID itemId) {
         String sql = "DELETE FROM cart_items WHERE id = ?";
@@ -110,7 +114,7 @@ public class CartDAO extends DAO {
 
     /**
      * Xóa toàn bộ giỏ hàng của user.
-     * clearCart() - được gọi từ CheckoutFrm sau khi đặt hàng thành công.
+     * clearCart() - được gọi từ CheckoutView sau khi đặt hàng thành công.
      */
     public void clearCart(UUID userId) {
         String sql = "DELETE FROM cart_items WHERE user_id = ?";

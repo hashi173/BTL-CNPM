@@ -1,2 +1,2 @@
 Main-Class: com.coffeeshop.Main
-Class-Path: lib/postgresql-42.7.5.jar
+Class-Path: lib/postgresql-42.7.5.jar lib/atlantafx-base-1.0.0.jar

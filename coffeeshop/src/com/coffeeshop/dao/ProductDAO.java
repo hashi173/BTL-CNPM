@@ -10,14 +10,13 @@ import java.util.UUID;
 
 /**
  * product_DAO - Truy xuất dữ liệu bảng products.
- * Kế thừa từ lớp DAO để điều khiển truy nhập chung vào CSDL.
+ * 
+ * [CNPM] Use Case: Quản lý sản phẩm
+ * Phụ trách: Quỳnh
+ * Mô tả: DAO xử lý các thao tác lấy danh sách, tìm kiếm, thêm, sửa, xóa sản phẩm.
  */
 public class ProductDAO extends DAO {
 
-    /**
-     * Lấy danh sách tất cả sản phẩm đang hoạt động.
-     * getAllProducts() - được gọi từ MenuFrm và ManageProductFrm.
-     */
     public List<Products> getAllProducts() {
         List<Products> list = new ArrayList<>();
         String sql = "SELECT p.*, c.name AS category_name FROM products p " +
@@ -36,9 +35,6 @@ public class ProductDAO extends DAO {
         return list;
     }
 
-    /**
-     * Lấy tất cả sản phẩm (bao gồm cả không hoạt động) cho admin.
-     */
     public List<Products> getAllProductsAdmin() {
         List<Products> list = new ArrayList<>();
         String sql = "SELECT p.*, c.name AS category_name FROM products p " +
@@ -56,10 +52,6 @@ public class ProductDAO extends DAO {
         return list;
     }
 
-    /**
-     * Lấy chi tiết sản phẩm theo ID.
-     * getProductDetail() - được gọi từ ProductDetailFrm và EditProductFrm.
-     */
     public Products getProductDetail(UUID id) {
         String sql = "SELECT p.*, c.name AS category_name FROM products p " +
                      "LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?";
@@ -77,10 +69,6 @@ public class ProductDAO extends DAO {
         return null;
     }
 
-    /**
-     * Tìm kiếm sản phẩm theo từ khóa (tên hoặc mã).
-     * searchProduct() - được gọi từ ManageProductFrm.
-     */
     public List<Products> searchProduct(String keyword) {
         List<Products> list = new ArrayList<>();
         String sql = "SELECT p.*, c.name AS category_name FROM products p " +
@@ -103,10 +91,6 @@ public class ProductDAO extends DAO {
         return list;
     }
 
-    /**
-     * Cập nhật giá sản phẩm.
-     * updatePrice() - được gọi từ EditProductFrm.
-     */
     public boolean updatePrice(UUID id, BigDecimal newPrice) {
         String sql = "UPDATE products SET base_price = ? WHERE id = ?";
         try {
@@ -121,13 +105,9 @@ public class ProductDAO extends DAO {
         return false;
     }
 
-    /**
-     * Cập nhật toàn bộ thông tin sản phẩm.
-     * updateProduct() - được gọi từ EditProductFrm.
-     */
     public boolean updateProduct(Products product) {
         String sql = "UPDATE products SET name = ?, description = ?, base_price = ?, " +
-                     "category_id = ?, is_available = ? WHERE id = ?";
+                     "category_id = ?, is_available = ?, image_path = ? WHERE id = ?";
         try {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -136,7 +116,8 @@ public class ProductDAO extends DAO {
             ps.setBigDecimal(3, product.getBasePrice());
             ps.setObject(4, product.getCategoryId());
             ps.setBoolean(5, product.isAvailable());
-            ps.setObject(6, product.getId());
+            ps.setString(6, product.getImagePath());
+            ps.setObject(7, product.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -144,13 +125,9 @@ public class ProductDAO extends DAO {
         return false;
     }
 
-    /**
-     * Thêm sản phẩm mới.
-     * addProduct() - được gọi từ EditProductFrm (chế độ thêm).
-     */
     public boolean addProduct(Products product) {
-        String sql = "INSERT INTO products (id, name, description, base_price, category_id, is_available, created_at, updated_at) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())";
+        String sql = "INSERT INTO products (id, name, description, base_price, category_id, is_available, image_path, created_at, updated_at) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
         try {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -161,6 +138,7 @@ public class ProductDAO extends DAO {
             ps.setBigDecimal(4, product.getBasePrice());
             ps.setObject(5, product.getCategoryId());
             ps.setBoolean(6, product.isAvailable());
+            ps.setString(7, product.getImagePath());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -168,10 +146,6 @@ public class ProductDAO extends DAO {
         return false;
     }
 
-    /**
-     * Xóa sản phẩm.
-     * deleteProduct() - được gọi từ ManageProductFrm.
-     */
     public boolean deleteProduct(UUID id) {
         String sql = "DELETE FROM products WHERE id = ?";
         try {
@@ -180,15 +154,10 @@ public class ProductDAO extends DAO {
             ps.setObject(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            // Nếu không xóa được (có ràng buộc), thì khóa sản phẩm
             return updateStatus(id, false);
         }
     }
 
-    /**
-     * Cập nhật trạng thái sản phẩm (khóa/mở).
-     * updateStatus() - được gọi từ ManageProductFrm.
-     */
     public boolean updateStatus(UUID id, boolean available) {
         String sql = "UPDATE products SET is_available = ? WHERE id = ?";
         try {
@@ -214,6 +183,9 @@ public class ProductDAO extends DAO {
         p.setAvailable(rs.getBoolean("is_available"));
         p.setCreatedAt(rs.getTimestamp("created_at"));
         p.setUpdatedAt(rs.getTimestamp("updated_at"));
+        try {
+            p.setImagePath(rs.getString("image_path"));
+        } catch (SQLException ignored) {}
         try {
             p.setCategoryName(rs.getString("category_name"));
         } catch (SQLException ignored) {}

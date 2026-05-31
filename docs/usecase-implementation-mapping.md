@@ -1,25 +1,25 @@
 # Usecase to Implementation Mapping
 
-This document traces the use cases from `BTL-CNPM1.md` to their concrete Java Swing implementations.
+This document traces the use cases from `BTL-CNPM1.md` to their concrete JavaFX implementations.
 
 ## Client Usecases
 
 ### 1. Đặt đơn hàng (Order Placement)
-- **Flow**: `LoginFrm` -> `HomeFrm` -> `MenuFrm` -> `ProductDetailFrm` -> `CartFrm` -> `CheckoutFrm` -> `OrderListFrm`
+- **Flow**: `LoginView` -> `HomeView` -> `MenuView` -> `ProductDetailView` -> `CartView` -> `CheckoutView` -> `OrderListView`
 - **Actions**:
-  - Xem danh sách món: `MenuFrm.loadProducts()` -> `ProductDAO.getAllProducts()`
-  - Tùy chỉnh (Đường, Đá, Size): `ProductDetailFrm`
+  - Xem danh sách món: `MenuView.loadProducts()` -> `ProductDAO.getAllProducts()`
+  - Tùy chỉnh (Đường, Đá, Size): `ProductDetailView`
   - Giỏ hàng: `CartDAO.addCartItem()`, `CartDAO.getAllCart()`
-  - Thanh toán: `CheckoutFrm.actionPerformed()` -> `OrderDAO.createOrder()` -> `OrderItemDAO.addOrderItem()` -> `CartDAO.clearCart()`
+  - Thanh toán: `CheckoutView` xử lý xác nhận -> `OrderDAO.createOrder()` -> `OrderItemDAO.addOrderItem()` -> `CartDAO.clearCart()`
 
 ### 2. Theo dõi đơn hàng (Order Tracking & Cancellation)
-- **Flow**: `HomeFrm` -> `OrderListFrm` -> `CancelConfirmFrm`
+- **Flow**: `HomeView` -> `OrderListView` -> `ClientOrderDetailView` -> `CancelConfirmView`
 - **Actions**:
-  - Xem đơn hàng: `OrderListFrm.loadOrders()` -> `OrderDAO.getOrdersByUser()`
-  - Xác nhận hủy: `CancelConfirmFrm.actionPerformed()` -> `OrderDAO.checkOrderStatus()` -> `OrderDAO.cancelOrder()`
+  - Xem đơn hàng: `OrderListView.loadOrders()` -> `OrderDAO.getOrdersByUser()`
+  - Xác nhận hủy: `CancelConfirmView` -> `OrderDAO.checkOrderStatus()` -> `OrderDAO.cancelOrder()`
 
 ### 3. Quản lý giỏ hàng (Cart Management)
-- **Flow**: `CartFrm`
+- **Flow**: `CartView`
 - **Actions**:
   - Sửa số lượng / Xóa món: `CartDAO.updateQuantity()`, `CartDAO.removeCartItem()`
 
@@ -28,24 +28,24 @@ This document traces the use cases from `BTL-CNPM1.md` to their concrete Java Sw
 ## Admin Usecases
 
 ### 4. Quản lý sản phẩm (Product Management)
-- **Flow**: `AdminHomeFrm` -> `ManageProductFrm` -> `EditProductFrm`
+- **Flow**: `AdminHomeView` -> `ManageProductView` -> `EditProductView`
 - **Actions**:
-  - Tìm kiếm / Hiển thị: `ManageProductFrm.loadAllProducts()` -> `ProductDAO.getAllProductsAdmin()` / `ProductDAO.searchProduct()`
+  - Tìm kiếm / Hiển thị: `ManageProductView.loadAllProducts()` -> `ProductDAO.getAllProductsAdmin()` / `ProductDAO.searchProduct()`
   - Thêm / Sửa / Xóa: `ProductDAO.addProduct()`, `ProductDAO.updateProduct()`, `ProductDAO.deleteProduct()`
 
 ### 5. Quản lý danh mục (Category Management)
-- **Flow**: `AdminHomeFrm` -> `ManageCategoryFrm` -> `AddCategoryFrm`
+- **Flow**: `AdminHomeView` -> `ManageCategoryView` -> `AddCategoryView`
 - **Actions**:
-  - Quản lý danh sách: `ManageCategoryFrm.loadAllCategories()` -> `CategoryDAO.getAllCategories()`
+  - Quản lý danh sách: `ManageCategoryView.loadAllCategories()` -> `CategoryDAO.getAllCategories()`
   - Thêm / Sửa / Xóa: `CategoryDAO.addCategory()`, `CategoryDAO.updateCategory()`, `CategoryDAO.deleteCategory()`
 
 ### 6. Quản lý đơn hàng (Order Management)
-- **Flow**: `AdminHomeFrm` -> `OrderManagementFrm` -> `OrderDetailFrm`
+- **Flow**: `AdminHomeView` -> `OrderManagementView` -> `OrderDetailView`
 - **Actions**:
-  - Tìm kiếm / Hiển thị: `OrderManagementFrm.loadAllOrders()` -> `OrderDAO.getAllOrders()` / `OrderDAO.searchOrders()`
-  - Cập nhật trạng thái: `OrderDetailFrm.actionPerformed()` -> `OrderDAO.updateOrderStatus()`
+  - Tìm kiếm / Hiển thị: `OrderManagementView.loadAllOrders()` -> `OrderDAO.getAllOrders()` / `OrderDAO.searchOrders()`
+  - Cập nhật trạng thái: `OrderDetailView` xử lý đổi trạng thái -> `OrderDAO.updateOrderStatus()`
 
 ### 7. Xem thống kê (Statistics)
-- **Flow**: `AdminHomeFrm` -> `StatFrm`
+- **Flow**: `AdminHomeView` -> `StatView` -> `StatDetailView`
 - **Actions**:
-  - Thống kê doanh thu theo món: `StatFrm.loadStatData()` -> `OrderDAO.getStatByProduct()`
+  - Thống kê doanh thu theo món: `StatView.loadStatData()` -> `OrderDAO.getStatByProduct()`

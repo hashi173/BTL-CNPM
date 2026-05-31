@@ -16,7 +16,7 @@ public class OrderItemDAO extends DAO {
 
     /**
      * Thêm chi tiết đơn hàng.
-     * addOrderItem() - được gọi từ CheckoutFrm sau khi createOrder.
+     * addOrderItem() - được gọi từ CheckoutView sau khi createOrder.
      */
     public boolean addOrderItem(OrderItems item) {
         String sql = "INSERT INTO order_items (order_id, product_id, snapshot_product_name, " +
@@ -48,7 +48,7 @@ public class OrderItemDAO extends DAO {
 
     /**
      * Lấy danh sách chi tiết đơn hàng theo orderId.
-     * getOrderItems() - được gọi từ OrderDetailFrm.
+     * getOrderItems() - được gọi từ OrderDetailView.
      */
     public List<OrderItems> getOrderItems(UUID orderId) {
         List<OrderItems> list = new ArrayList<>();

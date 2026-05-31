@@ -3,6 +3,7 @@ package com.coffeeshop.dao;
 import com.coffeeshop.model.Orders;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,12 +11,17 @@ import java.util.UUID;
 /**
  * order_DAO - Truy xuất dữ liệu bảng orders.
  * Kế thừa từ lớp DAO để điều khiển truy nhập chung vào CSDL.
+ * 
+ * [CNPM] Các Use case liên quan:
+ * - Đặt hàng (Thi)
+ * - Quản lý đơn hàng (Hà)
+ * - Xem thống kê (Bách)
  */
 public class OrderDAO extends DAO {
 
     /**
      * Tạo đơn hàng mới.
-     * createOrder() - được gọi từ CheckoutFrm.
+     * createOrder() - được gọi từ CheckoutView.
      */
     public Orders createOrder(Orders order) {
         String sql = "INSERT INTO orders (id, user_id, customer_name, phone, address_text, note, " +
@@ -50,7 +56,7 @@ public class OrderDAO extends DAO {
 
     /**
      * Lấy tất cả đơn hàng.
-     * getAllOrders() - được gọi từ OrderManagementFrm.
+     * getAllOrders() - được gọi từ OrderManagementView.
      */
     public List<Orders> getAllOrders() {
         List<Orders> list = new ArrayList<>();
@@ -70,7 +76,7 @@ public class OrderDAO extends DAO {
 
     /**
      * Lấy danh sách đơn hàng theo user.
-     * getOrdersByUser() - được gọi từ OrderListFrm.
+     * getOrdersByUser() - được gọi từ OrderListView.
      */
     public List<Orders> getOrdersByUser(UUID userId) {
         List<Orders> list = new ArrayList<>();
@@ -113,7 +119,7 @@ public class OrderDAO extends DAO {
 
     /**
      * Lấy chi tiết đơn hàng theo ID.
-     * getOrderDetail() - được gọi từ OrderDetailFrm và CancelConfirmFrm.
+     * getOrderDetail() - được gọi từ OrderDetailView và CancelConfirmView.
      */
     public Orders getOrderDetail(UUID orderId) {
         String sql = "SELECT * FROM orders WHERE id = ?";
@@ -153,7 +159,7 @@ public class OrderDAO extends DAO {
 
     /**
      * Hủy đơn hàng - cập nhật trạng thái thành CANCELLED.
-     * cancelOrder() - được gọi từ CancelConfirmFrm.
+     * cancelOrder() - được gọi từ CancelConfirmView.
      */
     public boolean cancelOrder(UUID orderId) {
         String sql = "UPDATE orders SET status = 'CANCELLED', updated_at = NOW() WHERE id = ?";
@@ -170,7 +176,7 @@ public class OrderDAO extends DAO {
 
     /**
      * Cập nhật trạng thái đơn hàng.
-     * updateOrderStatus() - được gọi từ OrderDetailFrm.
+     * updateOrderStatus() - được gọi từ OrderDetailView.
      */
     public boolean updateOrderStatus(UUID orderId, String status) {
         String sql = "UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?";
@@ -188,7 +194,8 @@ public class OrderDAO extends DAO {
 
     /**
      * Thống kê theo sản phẩm.
-     * getStatByProduct() - được gọi từ StatFrm.
+     * [CNPM] Use Case: Xem thống kê - Phụ trách: Bách
+     * Mô tả: Truy vấn SUM(số lượng) và SUM(doanh thu) từ CSDL.
      */
     public List<Object[]> getStatByProduct(String productName) {
         return getStatByProductAndTime(productName, null, null);
@@ -240,25 +247,24 @@ public class OrderDAO extends DAO {
 
     /**
      * Thống kê doanh thu theo tháng.
-     * getMonthlyRevenue() - được gọi từ StatFrm.
+     * getMonthlyRevenue() - được gọi từ StatView.
      */
     public List<Object[]> getMonthlyRevenue() {
         List<Object[]> list = new ArrayList<>();
-        String sql = "SELECT EXTRACT(YEAR FROM created_at) AS year, " +
-                     "EXTRACT(MONTH FROM created_at) AS month, " +
+        String sql = "SELECT EXTRACT(MONTH FROM created_at) AS month, " +
                      "SUM(total_amount) AS total " +
-                     "FROM orders WHERE status = 'COMPLETED' " +
-                     "GROUP BY EXTRACT(YEAR FROM created_at), EXTRACT(MONTH FROM created_at) " +
-                     "ORDER BY year DESC, month DESC";
+                     "FROM orders WHERE status != 'CANCELLED' " +
+                     "AND EXTRACT(YEAR FROM created_at) = (SELECT COALESCE(EXTRACT(YEAR FROM MAX(created_at)), EXTRACT(YEAR FROM CURRENT_DATE)) FROM orders) " +
+                     "GROUP BY EXTRACT(MONTH FROM created_at) " +
+                     "ORDER BY month";
         try {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Object[] row = new Object[3];
-                row[0] = rs.getInt("year");
-                row[1] = rs.getInt("month");
-                row[2] = rs.getDouble("total");
+                Object[] row = new Object[2];
+                row[0] = rs.getInt("month");
+                row[1] = rs.getDouble("total");
                 list.add(row);
             }
         } catch (SQLException e) {
@@ -367,6 +373,138 @@ public class OrderDAO extends DAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return list;
+    }
+
+    /** Tổng số đơn hàng. */
+    public int getTotalOrders() {
+        String sql = "SELECT COUNT(*) FROM orders";
+        try {
+            Connection conn = getConnection();
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    /** Lấy ngày của đơn hàng mới nhất để làm mốc lọc thống kê. */
+    public LocalDate getLatestOrderDate() {
+        String sql = "SELECT MAX(created_at) FROM orders";
+        try {
+            Connection conn = getConnection();
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            if (rs.next() && rs.getTimestamp(1) != null) {
+                return rs.getTimestamp(1).toLocalDateTime().toLocalDate();
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return LocalDate.now();
+    }
+
+    /** Tổng doanh thu (không tính đơn hủy). */
+    public double getTotalRevenue() {
+        String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE status != 'CANCELLED'";
+        try {
+            Connection conn = getConnection();
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    /** Doanh thu hôm nay. */
+    public double getTodayRevenue() {
+        String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE status != 'CANCELLED' AND DATE(created_at) = CURRENT_DATE";
+        try {
+            Connection conn = getConnection();
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    /** Đơn hàng hôm nay. */
+    public int getTodayOrders() {
+        String sql = "SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURRENT_DATE";
+        try {
+            Connection conn = getConnection();
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    /** Đơn hàng theo user. */
+    public int getOrdersByUserCount(UUID userId) {
+        String sql = "SELECT COUNT(*) FROM orders WHERE user_id = ?";
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setObject(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    /** Chi tiêu theo user (tháng này). */
+    public double getUserMonthlySpending(UUID userId) {
+        String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE user_id = ? AND status != 'CANCELLED' AND EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)";
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setObject(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    /** Top sản phẩm bán chạy (limit). */
+    public List<Object[]> getTopSellingProducts(int limit) {
+        String sql = "SELECT oi.snapshot_product_name, SUM(oi.quantity) as total_qty, SUM(oi.sub_total) as total_rev, MAX(p.image_path) as image_path " +
+                     "FROM order_items oi " +
+                     "JOIN orders o ON oi.order_id = o.id " +
+                     "LEFT JOIN products p ON oi.product_id = p.id " +
+                     "WHERE o.status != 'CANCELLED' " +
+                     "GROUP BY oi.snapshot_product_name ORDER BY total_qty DESC LIMIT ?";
+        List<Object[]> list = new ArrayList<>();
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, limit);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Object[] row = new Object[4];
+                row[0] = rs.getString("snapshot_product_name");
+                row[1] = rs.getInt("total_qty");
+                row[2] = rs.getDouble("total_rev");
+                row[3] = rs.getString("image_path");
+                list.add(row);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    /** Đơn hàng gần đây (limit). */
+    public List<Orders> getRecentOrders(int limit) {
+        String sql = "SELECT * FROM orders ORDER BY created_at DESC LIMIT ?";
+        List<Orders> list = new ArrayList<>();
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, limit);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Orders o = new Orders();
+                o.setId(UUID.fromString(rs.getString("id")));
+                o.setCustomerName(rs.getString("customer_name"));
+                o.setTotalAmount(rs.getDouble("total_amount"));
+                o.setStatus(rs.getString("status"));
+                o.setTrackingCode(rs.getString("tracking_code"));
+                o.setCreatedAt(rs.getTimestamp("created_at"));
+                list.add(o);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
         return list;
     }
 }

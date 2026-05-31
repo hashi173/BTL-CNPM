@@ -1,12 +1,12 @@
 # Hướng Dẫn Triển Khai (Deployment Guide)
 
-Tài liệu này cung cấp hướng dẫn chi tiết từ A-Z về cách cài đặt môi trường và chạy ứng dụng quản lý quán cà phê (Coffee Shop Management System - Java Swing) hoàn toàn bằng **Terminal / Command Line** cho cả macOS và Windows.
+Tài liệu này cung cấp hướng dẫn chi tiết từ A-Z về cách cài đặt môi trường và chạy ứng dụng quản lý quán cà phê (Coffee Shop Management System - JavaFX) hoàn toàn bằng **Terminal / Command Line** cho cả macOS và Windows.
 
 ---
 
 ## 1. Cài Đặt Môi Trường (Install Prerequisites)
 
-Bạn cần cài đặt Java (JDK 17) và PostgreSQL.
+Bạn cần cài đặt Java (JDK 17) và PostgreSQL. **Lưu ý:** Vì dự án sử dụng giao diện **JavaFX** và **AtlantaFX**, nếu chạy bằng dòng lệnh (không dùng IDE như IntelliJ/Eclipse), bạn cần cấu hình JavaFX SDK hoặc tải đủ thư viện JavaFX vào thư mục `lib`.
 
 ### Trên macOS (Sử dụng Homebrew)
 Mở ứng dụng **Terminal** và chạy các lệnh sau:
@@ -40,7 +40,7 @@ winget install -e --id PostgreSQL.PostgreSQL
 
 ## 2. Thiết Lập Cơ Sở Dữ Liệu (Database Setup)
 
-Chúng ta sẽ tạo user `cafe_admin`, database `coffeeshop` và import dữ liệu mẫu.
+Chúng ta sẽ tạo user `coffee_admin`, database `coffeeshop` và import dữ liệu mẫu.
 
 ### Trên macOS
 Mở Terminal, di chuyển vào thư mục `coffeeshop` và chạy:
@@ -53,8 +53,9 @@ CREATE USER coffee_admin WITH PASSWORD '123';
 CREATE DATABASE coffeeshop OWNER coffee_admin;
 \q
 
-# Import file schema.sql vào database vừa tạo
+# Import file schema.sql và seed_full.sql vào database vừa tạo
 psql -d coffeeshop -f sql/schema.sql
+psql -d coffeeshop -f sql/seed_full.sql
 ```
 
 ### Trên Windows
@@ -69,50 +70,79 @@ CREATE USER coffee_admin WITH PASSWORD '123';
 CREATE DATABASE coffeeshop OWNER coffee_admin;
 \q
 
-# Import file schema.sql vào database (thêm cờ -U postgres nếu cần)
+# Import file schema.sql và seed_full.sql vào database (thêm cờ -U postgres nếu cần)
 psql -U postgres -d coffeeshop -f sql\schema.sql
+psql -U postgres -d coffeeshop -f sql\seed_full.sql
 ```
 
 ---
 
 ## 3. Biên Dịch Mã Nguồn (Compilation)
 
-Ứng dụng cần được biên dịch từ file `.java` sang file `.class` và lưu vào thư mục `bin`. 
-Di chuyển vào thư mục `coffeeshop`:
+Để đơn giản hóa quá trình biên dịch, dự án đã cung cấp sẵn các script biên dịch tự động. Bạn chỉ cần di chuyển vào thư mục `coffeeshop` và chạy script tương ứng với hệ điều hành:
 
-### Trên macOS
-```bash
-cd coffeeshop
-mkdir -p bin
-javac -encoding UTF-8 -d bin $(find src -name "*.java")
+### Trên Windows
+Mở **Command Prompt (cmd)** hoặc **PowerShell**, di chuyển vào thư mục `coffeeshop` và chạy:
+```cmd
+build.bat
 ```
 
-### Trên Windows (PowerShell)
-```powershell
-cd coffeeshop
-mkdir -Force bin
-javac -encoding UTF-8 -d bin (Get-ChildItem -Path src -Recurse -Filter *.java | Select-Object -ExpandProperty FullName)
+### Trên macOS / Linux
+Mở **Terminal**, di chuyển vào thư mục `coffeeshop` và chạy:
+```bash
+# Cấp quyền thực thi cho file script (chỉ cần chạy một lần duy nhất)
+chmod +x build.sh run.sh
+
+# Biên dịch mã nguồn
+./build.sh
 ```
 
 ---
 
 ## 4. Khởi Chạy Ứng Dụng (Run)
 
-Sau khi biên dịch thành công, vẫn ở trong thư mục `coffeeshop`, chạy lệnh sau để khởi động phần mềm:
+Sau khi biên dịch thành công, để khởi chạy ứng dụng:
 
-### Trên macOS
-```bash
-java -cp "bin:lib/postgresql-42.7.5.jar" com.coffeeshop.Main
+### Trên Windows
+Vẫn ở trong thư mục `coffeeshop`, chạy file script khởi chạy:
+```cmd
+run.bat
 ```
 
-### Trên Windows (PowerShell)
-```powershell
-java -cp "bin;lib/postgresql-42.7.5.jar" com.coffeeshop.Main
+### Trên macOS / Linux
+Vẫn ở trong thư mục `coffeeshop`, chạy file script khởi chạy:
+```bash
+./run.sh
 ```
 
 ---
 
-## 5. Tài Khoản Đăng Nhập Mặc Định
+## 5. Gói Ứng Dụng Thành File JAR (Packaging as JAR)
+
+Script biên dịch tự động (`build.bat` và `build.sh`) đã được cấu hình để **tự động đóng gói** ứng dụng thành file thực thi `CoffeeShop.jar` ngay trong thư mục `coffeeshop` sau khi biên dịch thành công.
+
+Để chạy trực tiếp file JAR này:
+
+### Cách 1: Chạy bằng dòng lệnh (Khuyên dùng)
+Mở terminal/cmd tại thư mục `coffeeshop` và chạy lệnh sau:
+- **Trên Windows**:
+  ```cmd
+  java --module-path "lib/javafx-sdk-17.0.12/lib" --add-modules javafx.controls -jar CoffeeShop.jar
+  ```
+- **Trên macOS / Linux**:
+  ```bash
+  java --module-path "lib/javafx-sdk-17.0.12/lib" --add-modules javafx.controls -jar CoffeeShop.jar
+  ```
+
+*(Lưu ý: Bạn không cần khai báo thêm các thư viện PostgreSQL hay AtlantaFX ở dòng lệnh vì file JAR đã được cấu hình tự động tìm chúng trong thư mục `lib` qua Manifest).*
+
+### Cách 2: Double-click để chạy trực tiếp (Không cần dòng lệnh)
+Để có thể kích đúp chuột (Double-click) chạy trực tiếp file `CoffeeShop.jar` mà không cần thông qua terminal, máy tính của bạn (hoặc giáo viên chấm bài) cần cài đặt **JDK đã tích hợp sẵn JavaFX** (ví dụ: **BellSoft Liberica JDK (Full)** hoặc **Azul Zulu JDK (Fx package)**). 
+Nếu dùng các phiên bản JDK này, hệ thống sẽ tự động nhận diện JavaFX và chạy file JAR mượt mà bằng double-click.
+
+---
+
+## 6. Tài Khoản Đăng Nhập Mặc Định
 
 Sử dụng các tài khoản sau để đăng nhập vào hệ thống (đã được tự động tạo qua file `schema.sql`):
 

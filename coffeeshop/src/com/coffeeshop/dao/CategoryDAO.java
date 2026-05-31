@@ -10,12 +10,16 @@ import java.util.UUID;
 /**
  * category_DAO - Truy xuất dữ liệu bảng categories.
  * Kế thừa từ lớp DAO để điều khiển truy nhập chung vào CSDL.
+ * 
+ * [CNPM] Use Case: Quản lý danh mục
+ * Phụ trách: Quỳnh
+ * Mô tả: Chứa các nghiệp vụ Thêm, Sửa, Xóa, Lấy danh sách danh mục.
  */
 public class CategoryDAO extends DAO {
 
     /**
      * Lấy danh sách tất cả danh mục.
-     * getAllCategories() - được gọi từ ManageCategoryFrm và EditProductFrm.
+     * getAllCategories() - được gọi từ ManageCategoryView và EditProductView.
      */
     public List<Categories> getAllCategories() {
         List<Categories> list = new ArrayList<>();
@@ -54,7 +58,7 @@ public class CategoryDAO extends DAO {
 
     /**
      * Thêm danh mục mới.
-     * addCategory() - được gọi từ AddCategoryFrm.
+     * addCategory() - được gọi từ AddCategoryView.
      */
     public boolean addCategory(Categories category) {
         String sql = "INSERT INTO categories (id, name, description, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())";
@@ -74,7 +78,7 @@ public class CategoryDAO extends DAO {
 
     /**
      * Cập nhật danh mục.
-     * updateCategory() - được gọi từ AddCategoryFrm (chế độ chỉnh sửa).
+     * updateCategory() - được gọi từ AddCategoryView (chế độ chỉnh sửa).
      */
     public boolean updateCategory(Categories category) {
         String sql = "UPDATE categories SET name = ?, description = ?, updated_at = NOW() WHERE id = ?";
@@ -93,7 +97,7 @@ public class CategoryDAO extends DAO {
 
     /**
      * Xóa danh mục.
-     * deleteCategory() - được gọi từ ManageCategoryFrm.
+     * deleteCategory() - được gọi từ ManageCategoryView.
      */
     public boolean deleteCategory(UUID id) {
         String sql = "DELETE FROM categories WHERE id = ?";
@@ -110,7 +114,7 @@ public class CategoryDAO extends DAO {
 
     /**
      * Tìm kiếm danh mục theo từ khóa.
-     * searchCategories() - được gọi từ ManageCategoryFrm.
+     * searchCategories() - được gọi từ ManageCategoryView.
      */
     public List<Categories> searchCategories(String keyword) {
         List<Categories> list = new ArrayList<>();

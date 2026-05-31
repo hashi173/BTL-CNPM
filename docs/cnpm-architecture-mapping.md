@@ -2,27 +2,34 @@
 
 ## Architecture Overview
 
-This project implements a 3-tier MVC + DAO architecture using Java Swing.
+This project implements a 3-tier MVC + DAO architecture using JavaFX.
 
 ### 1. View (Presentation Layer)
-Contains Java Swing GUI components (`JFrame`). Responsible for rendering UI and capturing user input.
+Contains JavaFX GUI components. Responsible for rendering UI and capturing user input.
 
-**Client Views:**
-- `LoginFrm`: User authentication
-- `HomeFrm`: Main dashboard for client
-- `MenuFrm`: Product listing
-- `ProductDetailFrm`: Detailed product view & Add to Cart
-- `CartFrm`: View cart items & Checkout preparation
-- `CheckoutFrm`: Process orders
-- `OrderListFrm`: List user's orders
-- `CancelConfirmFrm`: Order cancellation
+**Client Views (`src/com/coffeeshop/view/client/`):**
+- `LoginView` (in `auth/`): User authentication
+- `RegisterView` (in `auth/`): User registration
+- `HomeView`: Main dashboard for client
+- `MenuView`: Product listing
+- `ProductDetailView`: Detailed product view & Add to Cart
+- `CartView`: View cart items & Checkout preparation
+- `CheckoutView`: Process orders
+- `OrderListView`: List user's orders
+- `ClientOrderDetailView`: Client's detailed order view
+- `CancelConfirmView`: Order cancellation
 
-**Admin Views:**
-- `AdminHomeFrm`: Admin dashboard
-- `ManageProductFrm` / `EditProductFrm`: Manage products
-- `ManageCategoryFrm` / `AddCategoryFrm`: Manage categories
-- `OrderManagementFrm` / `OrderDetailFrm`: Manage orders
-- `StatFrm`: Sales statistics
+**Admin Views (`src/com/coffeeshop/view/admin/`):**
+- `AdminHomeView`: Admin dashboard
+- `ManageProductView` / `EditProductView`: Manage products
+- `ManageCategoryView` / `AddCategoryView`: Manage categories
+- `OrderManagementView` / `OrderDetailView`: Manage orders
+- `StatView` / `StatDetailView`: Sales statistics
+
+**Shared Components:**
+- `DashboardView`: Main shell with Sidebar and Content Area
+- `SceneManager`: Centralized navigation controller
+- `ThemeFX`: Design system and UI utilities
 
 ### 2. Model (Entity Layer)
 Represents the database tables as Java objects (Entities).
@@ -47,6 +54,6 @@ Handles all interactions with the PostgreSQL database.
 
 ## Technical Stack
 - **Language**: Java 17+
-- **GUI Framework**: Java Swing
+- **GUI Framework**: JavaFX (with AtlantaFX Theme)
 - **Database**: PostgreSQL
 - **Driver**: PostgreSQL JDBC Driver

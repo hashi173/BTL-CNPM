@@ -16,6 +16,7 @@ public class Products {
     private boolean isAvailable;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private String imagePath;
 
     // Transient field - tên danh mục (JOIN)
     private String categoryName;
@@ -62,9 +63,9 @@ public class Products {
     public String getCategoryName() { return categoryName; }
     public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
 
-    /**
-     * Cập nhật giá sản phẩm.
-     */
+    public String getImagePath() { return imagePath; }
+    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
+
     public void updatePrice(BigDecimal newPrice) {
         this.basePrice = newPrice;
     }
