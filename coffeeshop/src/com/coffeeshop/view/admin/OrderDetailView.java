@@ -21,7 +21,7 @@ import java.util.UUID;
  * [CNPM] Use Case: Quản lý đơn hàng (xem chi tiết, cập nhật trạng thái)
  * Phụ trách: Hà
  * Mô tả: Admin xem chi tiết sản phẩm, thông tin khách hàng của một đơn,
- * và thay đổi trạng thái (VD: PENDING -> CONFIRMED -> SHIPPING -> DELIVERED).
+ * và thay đổi trạng thái (VD: PENDING -> CONFIRMED -> SHIPPING -> COMPLETED).
  */
 public class OrderDetailView extends VBox {
 
@@ -170,7 +170,7 @@ public class OrderDetailView extends VBox {
         } else if ("CONFIRMED".equals(currentStatus)) {
             cmbStatus.getItems().addAll("CONFIRMED", "SHIPPING", "CANCELLED");
         } else if ("SHIPPING".equals(currentStatus)) {
-            cmbStatus.getItems().addAll("SHIPPING", "DELIVERED", "CANCELLED");
+            cmbStatus.getItems().addAll("SHIPPING", "COMPLETED", "CANCELLED");
         } else {
             cmbStatus.getItems().add(currentStatus);
             cmbStatus.setDisable(true);

@@ -3,7 +3,6 @@ package com.coffeeshop.view.client;
 import com.coffeeshop.dao.OrderDAO;
 import com.coffeeshop.model.Products;
 import com.coffeeshop.model.Users;
-import com.coffeeshop.service.RecommendationService;
 import com.coffeeshop.view.SceneManager;
 import com.coffeeshop.view.ThemeFX;
 import javafx.geometry.Insets;
@@ -22,7 +21,6 @@ import java.util.List;
 public class HomeView extends ScrollPane {
 
     private final OrderDAO orderDAO = new OrderDAO();
-    private final RecommendationService recService = RecommendationService.getInstance();
 
     public HomeView(Users user) {
         setFitToWidth(true);
@@ -49,7 +47,7 @@ public class HomeView extends ScrollPane {
         // Stat Cards
         int totalOrders = orderDAO.getOrdersByUserCount(user.getId());
         double monthlySpending = orderDAO.getUserMonthlySpending(user.getId());
-        int todayOrders = orderDAO.getTodayOrders();
+        int todayOrders = orderDAO.getTodayOrdersByUser(user.getId());
 
         HBox statRow = new HBox(16);
         statRow.setPadding(new Insets(0, 0, 24, 0));
@@ -60,10 +58,6 @@ public class HomeView extends ScrollPane {
         );
         for (int i = 0; i < 3; i++) HBox.setHgrow(statRow.getChildren().get(i), Priority.ALWAYS);
         content.getChildren().add(statRow);
-
-        // ═══ GỢI Ý CHO BẠN (AI Recommendation) ═══
-        content.getChildren().add(createRecommendationsCard(user));
-
         // Quick Actions
         content.getChildren().add(createQuickActionsCard(user));
 
@@ -79,85 +73,6 @@ public class HomeView extends ScrollPane {
                 event.consume();
             }
         });
-    }
-
-    /**
-     * Gợi ý sản phẩm cho bạn — sử dụng thuật toán Collaborative Filtering + Rule-based.
-     */
-    private VBox createRecommendationsCard(Users user) {
-        VBox card = ThemeFX.card(20);
-        card.setSpacing(12);
-
-        Label title = new Label("✨ Gợi ý cho bạn");
-        title.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
-
-        Label subtitle = new Label("Dựa trên sở thích và lịch sử đặt hàng của bạn");
-        subtitle.setStyle("-fx-font-size: 12px; -fx-text-fill: #9CA3AF;");
-        subtitle.setPadding(new Insets(0, 0, 4, 0));
-
-        // Gọi thuật toán AI
-        List<Products> recommendations = recService.getRecommendations(user.getId());
-
-        if (recommendations.isEmpty()) {
-            Label empty = new Label("Đang tải gợi ý...");
-            empty.setStyle("-fx-text-fill: #9CA3AF;");
-            card.getChildren().addAll(title, subtitle, empty);
-            return card;
-        }
-
-        // Hiển thị dạng card ngang (scrollable)
-        HBox productRow = new HBox(12);
-        productRow.setPadding(new Insets(4, 0, 0, 0));
-
-        for (Products p : recommendations) {
-            VBox productCard = new VBox(6);
-            productCard.getStyleClass().add("action-card");
-            productCard.setAlignment(Pos.CENTER);
-            productCard.setPadding(new Insets(12));
-            productCard.setPrefWidth(140);
-            productCard.setMaxWidth(140);
-            productCard.setOnMouseClicked(e -> {
-                SceneManager.getInstance().openPopup(
-                    new ProductDetailView(user, p.getId()),
-                    "Chi tiết sản phẩm", 540, 640);
-            });
-
-            // Ảnh sản phẩm
-            ImageView img = new ImageView();
-            img.setFitWidth(80);
-            img.setFitHeight(80);
-            img.setPreserveRatio(true);
-            if (p.getImagePath() != null && !p.getImagePath().isEmpty()) {
-                try {
-                    String path = "/com/coffeeshop/resources/" + p.getImagePath();
-                    java.net.URL url = getClass().getResource(path);
-                    if (url != null) img.setImage(new Image(url.toExternalForm()));
-                } catch (Exception ignored) {}
-            }
-
-            Label name = new Label(p.getName());
-            name.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
-            name.setWrapText(true);
-            name.setAlignment(Pos.CENTER);
-            name.setMaxWidth(120);
-
-            Label price = new Label(String.format("%,.0fđ", p.getBasePrice()));
-            price.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #6C7DF5;");
-
-            productCard.getChildren().addAll(img, name, price);
-            productRow.getChildren().add(productCard);
-        }
-
-        ScrollPane scrollRow = new ScrollPane(productRow);
-        scrollRow.setFitToWidth(true);
-        scrollRow.setFitToHeight(true);
-        scrollRow.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollRow.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollRow.setStyle("-fx-background-color: transparent; -fx-border-width: 0; -fx-padding: 0;");
-        scrollRow.setPrefHeight(160);
-
-        card.getChildren().addAll(title, subtitle, scrollRow);
-        return card;
     }
 
     private VBox createQuickActionsCard(Users user) {

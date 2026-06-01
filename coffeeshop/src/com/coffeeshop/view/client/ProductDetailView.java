@@ -5,7 +5,6 @@ import com.coffeeshop.dao.ProductDAO;
 import com.coffeeshop.model.CartItems;
 import com.coffeeshop.model.Products;
 import com.coffeeshop.model.Users;
-import com.coffeeshop.service.RecommendationService;
 import com.coffeeshop.view.SceneManager;
 import com.coffeeshop.view.ThemeFX;
 import javafx.collections.FXCollections;
@@ -29,7 +28,6 @@ public class ProductDetailView extends VBox {
     private Products product;
     private final ProductDAO productDAO = new ProductDAO();
     private final CartDAO cartDAO = new CartDAO();
-    private final RecommendationService recService = RecommendationService.getInstance();
 
     public ProductDetailView(Users user, UUID productId) {
         this.currentUser = user;
@@ -96,12 +94,6 @@ public class ProductDetailView extends VBox {
 
         mainContent.getChildren().add(card);
 
-        // ─── Cross-selling: "Bạn có thể cũng thích" ──────────────
-        VBox crossSellingSection = createCrossSellingSection(productId);
-        if (crossSellingSection != null) {
-            mainContent.getChildren().add(crossSellingSection);
-        }
-
         ScrollPane scroll = new ScrollPane(mainContent);
         scroll.setFitToWidth(true);
         scroll.setStyle("-fx-background-color: transparent; -fx-border-width: 0;");
@@ -150,62 +142,7 @@ public class ProductDetailView extends VBox {
             cartDAO.addCartItem(item, currentUser.getId());
             new Alert(Alert.AlertType.INFORMATION, "Đã thêm \"" + product.getName() + "\" vào giỏ hàng!").showAndWait();
             ((Stage) getScene().getWindow()).close();
+            SceneManager.getInstance().switchContent(new CartView(currentUser));
         });
-    }
-
-    /**
-     * Tạo section "Bạn có thể cũng thích" — Cross-selling recommendations.
-     */
-    private VBox createCrossSellingSection(UUID productId) {
-        List<Products> crossSelling = recService.getCrossSelling(productId);
-        if (crossSelling.isEmpty()) return null;
-
-        VBox section = new VBox(10);
-        section.setPadding(new Insets(16, 0, 0, 0));
-
-        Label title = new Label("💡 Bạn có thể cũng thích");
-        title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
-
-        HBox productRow = new HBox(10);
-        for (Products p : crossSelling) {
-            VBox miniCard = new VBox(4);
-            miniCard.getStyleClass().add("action-card");
-            miniCard.setAlignment(Pos.CENTER);
-            miniCard.setPadding(new Insets(10));
-            miniCard.setPrefWidth(120);
-            miniCard.setMaxWidth(120);
-            miniCard.setOnMouseClicked(e -> {
-                // Mở popup mới cho sản phẩm được gợi ý
-                ProductDetailView newDetail = new ProductDetailView(currentUser, p.getId());
-                SceneManager.getInstance().openPopup(newDetail, "Chi tiết sản phẩm", 540, 640);
-            });
-
-            ImageView img = new ImageView();
-            img.setFitWidth(60);
-            img.setFitHeight(60);
-            img.setPreserveRatio(true);
-            if (p.getImagePath() != null && !p.getImagePath().isEmpty()) {
-                try {
-                    String path = "/com/coffeeshop/resources/" + p.getImagePath();
-                    java.net.URL url = getClass().getResource(path);
-                    if (url != null) img.setImage(new Image(url.toExternalForm()));
-                } catch (Exception ignored) {}
-            }
-
-            Label name = new Label(p.getName());
-            name.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
-            name.setWrapText(true);
-            name.setAlignment(Pos.CENTER);
-            name.setMaxWidth(100);
-
-            Label price = new Label(String.format("%,.0fđ", p.getBasePrice()));
-            price.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #6C7DF5;");
-
-            miniCard.getChildren().addAll(img, name, price);
-            productRow.getChildren().add(miniCard);
-        }
-
-        section.getChildren().addAll(title, productRow);
-        return section;
     }
 }

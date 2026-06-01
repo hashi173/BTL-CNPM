@@ -57,8 +57,8 @@ public class RegisterView extends StackPane {
             ThemeFX.formField("Mật khẩu *", txtPassword),
             ThemeFX.formField("Nhập lại mật khẩu *", txtConfirm),
             ThemeFX.formField("Họ và tên *", txtFullName),
-            ThemeFX.formField("Email", txtEmail),
-            ThemeFX.formField("Số điện thoại", txtPhone)
+            ThemeFX.formField("Email *", txtEmail),
+            ThemeFX.formField("Số điện thoại *", txtPhone)
         );
 
         Label lblError = new Label(" ");
@@ -89,8 +89,8 @@ public class RegisterView extends StackPane {
             String confirm = txtConfirm.getText();
             String fullName = txtFullName.getText().trim();
 
-            if (username.isEmpty() || password.isEmpty() || fullName.isEmpty()) {
-                lblError.setText("Vui lòng nhập đầy đủ Tên đăng nhập, Mật khẩu và Họ tên!");
+            if (username.isEmpty() || password.isEmpty() || fullName.isEmpty() || txtEmail.getText().trim().isEmpty() || txtPhone.getText().trim().isEmpty()) {
+                lblError.setText("Vui lòng nhập đầy đủ các thông tin bắt buộc!");
                 return;
             }
             if (!password.equals(confirm)) {

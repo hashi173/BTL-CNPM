@@ -206,7 +206,7 @@ public class OrderDAO extends DAO {
         String sql = "SELECT oi.snapshot_product_name, SUM(oi.quantity) AS total_qty, " +
                      "SUM(oi.sub_total) AS total_revenue " +
                      "FROM order_items oi JOIN orders o ON oi.order_id = o.id " +
-                     "WHERE o.status IN ('COMPLETED', 'DELIVERED') ";
+                     "WHERE o.status IN ('COMPLETED') ";
         if (productName != null && !productName.trim().isEmpty()) {
             sql += "AND LOWER(oi.snapshot_product_name) LIKE LOWER(?) ";
         }
@@ -335,7 +335,7 @@ public class OrderDAO extends DAO {
         List<Object[]> list = new ArrayList<>();
         String sql = "SELECT o.tracking_code, o.customer_name, o.phone, o.total_amount, o.status, o.created_at, oi.quantity " +
                      "FROM orders o JOIN order_items oi ON o.id = oi.order_id " +
-                     "WHERE o.status IN ('COMPLETED', 'DELIVERED') AND LOWER(oi.snapshot_product_name) = LOWER(?) ";
+                     "WHERE o.status IN ('COMPLETED') AND LOWER(oi.snapshot_product_name) = LOWER(?) ";
         
         if (fromDate != null && !fromDate.trim().isEmpty()) {
             sql += "AND o.created_at >= ?::timestamp ";
@@ -428,6 +428,19 @@ public class OrderDAO extends DAO {
         try {
             Connection conn = getConnection();
             ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    /** Đơn hàng hôm nay của user. */
+    public int getTodayOrdersByUser(UUID userId) {
+        String sql = "SELECT COUNT(*) FROM orders WHERE user_id = ? AND DATE(created_at) = CURRENT_DATE";
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setObject(1, userId);
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) { e.printStackTrace(); }
         return 0;

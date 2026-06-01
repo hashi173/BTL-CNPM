@@ -12,7 +12,6 @@ D:\Project\BTL-CNPM\coffeeshop\src\com\coffeeshop\model\OrderItems.java
 D:\Project\BTL-CNPM\coffeeshop\src\com\coffeeshop\model\Orders.java
 D:\Project\BTL-CNPM\coffeeshop\src\com\coffeeshop\model\Products.java
 D:\Project\BTL-CNPM\coffeeshop\src\com\coffeeshop\model\Users.java
-D:\Project\BTL-CNPM\coffeeshop\src\com\coffeeshop\service\RecommendationService.java
 D:\Project\BTL-CNPM\coffeeshop\src\com\coffeeshop\view\DashboardView.java
 D:\Project\BTL-CNPM\coffeeshop\src\com\coffeeshop\view\SceneManager.java
 D:\Project\BTL-CNPM\coffeeshop\src\com\coffeeshop\view\ThemeFX.java

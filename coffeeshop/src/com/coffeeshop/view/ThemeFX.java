@@ -183,7 +183,7 @@ public final class ThemeFX {
             case "Chờ xác nhận": badge.getStyleClass().add("badge-pending"); break;
             case "Đã xác nhận": badge.getStyleClass().add("badge-confirmed"); break;
             case "Đang giao": badge.getStyleClass().add("badge-shipping"); break;
-            case "Hoàn thành": case "Đã giao hàng": badge.getStyleClass().add("badge-completed"); break;
+            case "Hoàn thành": badge.getStyleClass().add("badge-completed"); break;
             case "Đã hủy": badge.getStyleClass().add("badge-cancelled"); break;
             default: badge.getStyleClass().add("badge-pending"); break;
         }
@@ -209,7 +209,6 @@ public final class ThemeFX {
             case "SHIPPING": return "Đang giao";
             case "COMPLETED": return "Hoàn thành";
             case "CANCELLED": return "Đã hủy";
-            case "DELIVERED": return "Đã giao hàng";
             default: return status;
         }
     }

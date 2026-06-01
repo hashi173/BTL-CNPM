@@ -47,21 +47,13 @@ public class CancelConfirmView extends StackPane {
         Label lblTotal = new Label(order != null ? String.format("Tổng tiền: %,.0f VND", order.getTotalAmount()) : "");
         lblTotal.setStyle("-fx-font-weight: bold; -fx-text-fill: #DC2626;");
 
-        ComboBox<String> cmbReason = new ComboBox<>(FXCollections.observableArrayList(
-            "Đổi ý không muốn mua nữa", "Đặt nhầm sản phẩm", "Thay đổi địa chỉ giao hàng",
-            "Thời gian giao hàng quá lâu", "Lý do khác"
-        ));
-        cmbReason.setValue("Đổi ý không muốn mua nữa");
-        cmbReason.setPrefWidth(320);
-
         Button btnBack = ThemeFX.outlineBtn("← Quay lại");
         Button btnConfirm = ThemeFX.dangerBtn("❌ Xác nhận hủy");
         btnConfirm.setPrefWidth(160);
         HBox buttons = ThemeFX.centeredButtonBar(btnBack, btnConfirm);
 
         card.setSpacing(12);
-        card.getChildren().addAll(warningIcon, title, lblCode, lblStatus, lblTotal,
-            ThemeFX.formField("Lý do hủy:", cmbReason), buttons);
+        card.getChildren().addAll(warningIcon, title, lblCode, lblStatus, lblTotal, buttons);
 
         getChildren().add(card);
 

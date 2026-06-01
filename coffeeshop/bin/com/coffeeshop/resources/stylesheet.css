@@ -407,10 +407,7 @@
     -fx-text-fill: #059669;
 }
 
-.badge-delivered {
-    -fx-background-color: #CCFBF1;
-    -fx-text-fill: #0D9488;
-}
+
 
 .badge-cancelled {
     -fx-background-color: #FEE2E2;
