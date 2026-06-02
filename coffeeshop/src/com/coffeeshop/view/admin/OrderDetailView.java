@@ -86,6 +86,23 @@ public class OrderDetailView extends VBox {
         TableColumn<OrderItems, String> colOptions = new TableColumn<>("Tùy chọn");
         colOptions.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getSnapshotOptions()));
         colOptions.setPrefWidth(200);
+        colOptions.setCellFactory(col -> new TableCell<>() {
+            private final Label label = new Label();
+            {
+                label.setWrapText(true);
+                label.prefWidthProperty().bind(col.widthProperty().subtract(10));
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    label.setText(item);
+                    setGraphic(label);
+                }
+            }
+        });
 
         TableColumn<OrderItems, String> colQty = new TableColumn<>("SL");
         colQty.setCellValueFactory(cd -> new SimpleStringProperty(String.valueOf(cd.getValue().getQuantity())));
