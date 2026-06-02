@@ -73,19 +73,19 @@ public class OrderDAOTest {
     }
 
     // ====================================================
-    // PHẦN 2: HUỶ ĐƠN HÀNG (Cancel Order)
+    // PHẦN 2: HUỶ ĐƠN HÀNG (Sử dụng Update Status -> CANCELLED)
     // ====================================================
 
     /**
      * Kịch bản: Admin huỷ đơn hàng đang ở trạng thái PENDING.
-     * Kỳ vọng: cancelOrder trả về true, và trong DB status chuyển thành CANCELLED.
+     * Kỳ vọng: updateOrderStatus trả về true, và trong DB status chuyển thành CANCELLED.
      */
     @Test
-    public void testCancelOrder1() {
+    public void testUpdateOrderStatus4_CancelPending() {
         OrderDAO dao = new OrderDAO();
         UUID pendingOrderId = UUID.fromString("<UUID-1>"); 
         
-        boolean result = dao.cancelOrder(pendingOrderId);
+        boolean result = dao.updateOrderStatus(pendingOrderId, "CANCELLED");
         Assert.assertTrue("Huỷ đơn hàng tồn tại phải thành công (true)", result);
         
         // Kiểm tra lại database xem đã cập nhật thành CANCELLED chưa
@@ -98,10 +98,10 @@ public class OrderDAOTest {
      * Kỳ vọng: Không có dòng nào bị ảnh hưởng, trả về false.
      */
     @Test
-    public void testCancelOrder2() {
+    public void testUpdateOrderStatus5_CancelFakeId() {
         OrderDAO dao = new OrderDAO();
         UUID fakeId = UUID.randomUUID();
-        boolean result = dao.cancelOrder(fakeId);
+        boolean result = dao.updateOrderStatus(fakeId, "CANCELLED");
         Assert.assertFalse("Huỷ đơn hàng không tồn tại phải trả về false", result);
     }
 
