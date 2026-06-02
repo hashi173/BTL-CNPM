@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════
+SET client_encoding = 'UTF8';
 -- SEED DATA FULL: Users + Orders + Order Items
 -- 10 users chia 4 nhóm, 60+ đơn hàng các tháng
--- ═══════════════════════════════════════════════════════════
 
 -- ═══ USERS (10 users, 4 nhóm) ═══
 -- Nhóm 1: Yêu cà phê (user 2,3,4)
