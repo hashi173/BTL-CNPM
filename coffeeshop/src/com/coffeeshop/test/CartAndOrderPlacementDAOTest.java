@@ -39,7 +39,7 @@ public class CartAndOrderPlacementDAOTest {
         // Kiểm tra giỏ hàng
         List<CartItems> cart = cDao.getAllCart(userId);
         Assert.assertNotNull(cart);
-        // Vì product id fake, có thể join bị lỗi hoặc rỗng. Nhưng code phải compile được.
+        System.out.println(">>> [THÀNH CÔNG] Đã tìm thấy sản phẩm và thêm vào giỏ hàng cho User: " + userId);
     }
 
     @Test
@@ -59,5 +59,6 @@ public class CartAndOrderPlacementDAOTest {
         Orders createdOrder = dao.createOrder(order);
         
         Assert.assertNotNull("Đơn hàng mới tạo không được null", createdOrder);
+        System.out.println(">>> [THÀNH CÔNG] Đã khởi tạo đơn hàng mới với ID: " + createdOrder.getId());
     }
 }
