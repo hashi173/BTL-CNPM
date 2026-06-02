@@ -28,7 +28,7 @@ public class ProductAndCategoryDAOTest {
         p.setBasePrice(new BigDecimal("35000"));
         p.setDescription("Delicious");
         p.setAvailable(true);
-        // p.setCategoryId(...)
+        p.setCategoryId(UUID.fromString("c1eebc99-9c0b-4ef8-bb6d-6bb9bd380c11"));
         
         boolean result = dao.addProduct(p);
         Assert.assertTrue("Thêm sản phẩm phải thành công (true)", result);

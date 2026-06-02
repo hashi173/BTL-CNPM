@@ -27,10 +27,10 @@ public class CartAndOrderPlacementDAOTest {
         
         // 2. Thêm vào giỏ
         CartDAO cDao = new CartDAO();
-        UUID userId = UUID.randomUUID();
+        UUID userId = UUID.fromString("b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22"); // Seeded client user
         
         CartItems item = new CartItems();
-        item.setProductId(UUID.randomUUID());
+        item.setProductId(UUID.fromString("f1eebc99-9c0b-4ef8-bb6d-6bb9bd380f11")); // Seeded product
         item.setQuantity(2);
         item.setOptions("Size M, No Ice");
         
@@ -47,12 +47,13 @@ public class CartAndOrderPlacementDAOTest {
         OrderDAO dao = new OrderDAO();
         Orders order = new Orders();
         order.setId(UUID.randomUUID());
-        order.setUserId(UUID.randomUUID());
+        order.setUserId(UUID.fromString("b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22"));
         order.setCustomerName("Nguyen Van Thi");
         order.setPhone("0987654321");
         order.setAddressText("123 Main St");
         order.setNote("Call me before delivery");
         order.setTotalAmount(100000.0);
+        order.setSubTotal(100000.0);
         order.setStatus("PENDING");
         
         Orders createdOrder = dao.createOrder(order);
