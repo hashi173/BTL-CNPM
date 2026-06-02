@@ -10,8 +10,12 @@ Thư mục này chứa 5 file test tương ứng với 5 phân hệ do 5 thành 
 ## Cách 1: Chạy trực tiếp trên IDE (IntelliJ IDEA / Eclipse / NetBeans)
 Đây là cách đơn giản và trực quan nhất.
 1. Mở Project trên IDE.
-2. Đảm bảo thư viện **JUnit 4** đã được add vào Project (Thường IDE sẽ gợi ý ấn `Alt + Enter` trên chữ `@Test` để tải thư viện về).
-3. Mở một trong các file Test (Ví dụ: `OrderDAOTest.java`).
+2. **Cập nhật thư viện:**
+   - Trong thư mục `lib/` của project, nhóm đã để sẵn 2 file: `junit-4.13.2.jar` và `hamcrest-core-1.3.jar`.
+   - **IntelliJ:** Bấm chuột phải vào 2 file này chọn `Add as Library...`.
+   - **Eclipse:** Chuột phải vào project -> Build Path -> Configure Build Path -> Libraries -> Add JARs -> trỏ tới 2 file này.
+   - **VS Code:** IDE tự động nhận diện nếu bạn mở đúng folder `coffeeshop` hoặc có thể cấu hình ở mục `Java: Dependencies`.
+3. Sau khi hết báo đỏ, mở một trong các file Test (Ví dụ: `OrderDAOTest.java`).
 4. Nhấn chuột phải vào vùng code hoặc nhấn vào biểu tượng 🟢 Nút Play màu xanh lá ở bên trái (cạnh tên class hoặc tên hàm).
 5. Chọn **Run 'OrderDAOTest'**.
 6. Giao diện Test Runner của IDE sẽ hiện ra ở phía dưới. 
