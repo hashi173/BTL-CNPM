@@ -22,6 +22,13 @@ Thư mục này chứa 5 file test tương ứng với 5 phân hệ do 5 thành 
    - **Tích xanh (✔)**: Test thành công (Code chuẩn).
    - **Gạch đỏ (✘)**: Test thất bại (Kết quả không như kỳ vọng).
 
+## Cách đọc kết quả Test (Dành cho người mới)
+Đặc thù của kiểm thử tự động (Unit Test) là nguyên tắc **"No news is good news"** (Không báo gì nghĩa là code chạy hoàn hảo).
+- **Kỳ vọng khi Test Pass (Thành công):** Bạn sẽ **không** thấy các dòng chữ báo lỗi đỏ lòm, màn hình Debug Console thường sẽ trống trơn hoặc lướt qua rất nhanh các mã hệ thống. Thay vào đó, bạn hãy nhìn tìm các **dấu tích xanh (✔)** xuất hiện bên cạnh tên hàm.
+- **Để xem log chi tiết (những dòng chữ System.out.println):**
+  - **Trên VS Code:** Đừng nhìn ở tab *Debug Console* hay *Terminal*. Hãy chuyển sang tab **Test Results** ở dưới cùng màn hình. Hoặc mở tab **Testing** (icon hình bình thí nghiệm 🧪) bên lề trái -> Click đúp vào tên bài test đã pass để xem chữ in ra.
+  - **Trên IntelliJ / Eclipse:** Cửa sổ *Run/Test* sẽ hiện ra ngay bên dưới, liệt kê danh sách các test có dấu tích xanh, click vào từng test để xem log console ở bên phải.
+
 ## Cách 2: Chạy bằng dòng lệnh (VS Code / Terminal)
 Nếu chạy bằng dòng lệnh Java thuần (ít dùng), bạn cần compile các file test này cùng với thư viện `junit.jar` và `hamcrest-core.jar` rồi dùng `org.junit.runner.JUnitCore` để thực thi.
 Do cấu trúc project hiện tại không dùng Maven/Gradle, khuyến khích các bạn dùng **Cách 1** để IDE tự động cấu hình classpath nhanh nhất.
