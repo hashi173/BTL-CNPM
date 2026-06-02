@@ -108,6 +108,7 @@ public class OrderManagementView extends VBox {
             SceneManager.getInstance().openPopup(
                 new OrderDetailView(currentAdmin, sel.getId()),
                 "Chi tiết đơn hàng", 860, 640);
+            btnSearch.fire();
         });
     }
 

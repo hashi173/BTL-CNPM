@@ -98,6 +98,7 @@ public class OrderListView extends VBox {
             SceneManager.getInstance().openPopup(
                 new ClientOrderDetailView(currentUser, sel.getId()),
                 "Chi tiết đơn hàng", 860, 640);
+            btnSearch.fire();
         });
 
         btnCancel.setOnAction(e -> {
@@ -109,6 +110,7 @@ public class OrderListView extends VBox {
             SceneManager.getInstance().openPopup(
                 new CancelConfirmView(currentUser, sel.getId()),
                 "Xác nhận hủy đơn", 480, 480);
+            btnSearch.fire();
         });
     }
 

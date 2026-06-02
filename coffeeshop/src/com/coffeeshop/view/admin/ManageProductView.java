@@ -133,8 +133,11 @@ public class ManageProductView extends VBox {
             }
         });
 
-        btnAdd.setOnAction(e -> SceneManager.getInstance().openPopup(
-            new EditProductView(currentAdmin, null), "Thêm sản phẩm", 520, 560));
+        btnAdd.setOnAction(e -> {
+            SceneManager.getInstance().openPopup(
+                new EditProductView(currentAdmin, null), "Thêm sản phẩm", 520, 720);
+            btnSearch.fire();
+        });
 
         btnEdit.setOnAction(e -> {
             Products sel = table.getSelectionModel().getSelectedItem();
@@ -143,7 +146,8 @@ public class ManageProductView extends VBox {
                 return;
             }
             SceneManager.getInstance().openPopup(
-                new EditProductView(currentAdmin, sel.getId()), "Chỉnh sửa sản phẩm", 520, 560);
+                new EditProductView(currentAdmin, sel.getId()), "Chỉnh sửa sản phẩm", 520, 720);
+            btnSearch.fire();
         });
 
         btnDelete.setOnAction(e -> {

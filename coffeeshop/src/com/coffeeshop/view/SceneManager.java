@@ -59,7 +59,7 @@ public class SceneManager {
         scene.getStylesheets().add(css);
         popup.setScene(scene);
         popup.setResizable(false);
-        popup.show();
+        popup.showAndWait();
     }
 
     /** Navigate to the dashboard (after login). */

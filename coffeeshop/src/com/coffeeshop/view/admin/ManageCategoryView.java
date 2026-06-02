@@ -86,8 +86,11 @@ public class ManageCategoryView extends VBox {
             }
         });
 
-        btnAdd.setOnAction(e -> SceneManager.getInstance().openPopup(
-            new AddCategoryView(currentAdmin, null), "Thêm danh mục", 480, 440));
+        btnAdd.setOnAction(e -> {
+            SceneManager.getInstance().openPopup(
+                new AddCategoryView(currentAdmin, null), "Thêm danh mục", 480, 560);
+            btnSearch.fire();
+        });
 
         btnEdit.setOnAction(e -> {
             Categories sel = table.getSelectionModel().getSelectedItem();
@@ -96,7 +99,8 @@ public class ManageCategoryView extends VBox {
                 return;
             }
             SceneManager.getInstance().openPopup(
-                new AddCategoryView(currentAdmin, sel.getId()), "Chỉnh sửa danh mục", 480, 440);
+                new AddCategoryView(currentAdmin, sel.getId()), "Chỉnh sửa danh mục", 480, 560);
+            btnSearch.fire();
         });
 
         btnDelete.setOnAction(e -> {
