@@ -11,6 +11,8 @@ import com.coffeeshop.dao.OrderDAO;
 import com.coffeeshop.model.Products;
 import com.coffeeshop.model.CartItems;
 import com.coffeeshop.model.Orders;
+import com.coffeeshop.dao.OrderItemDAO;
+import com.coffeeshop.model.OrderItems;
 
 /**
  * Lớp kiểm thử (JUnit) cho Module Đặt hàng và Giỏ hàng.
@@ -60,5 +62,38 @@ public class CartAndOrderPlacementDAOTest {
         
         Assert.assertNotNull("Đơn hàng mới tạo không được null", createdOrder);
         System.out.println(">>> [THÀNH CÔNG] Đã khởi tạo đơn hàng mới với ID: " + createdOrder.getId());
+    }
+
+    @Test
+    public void testAddOrderItem() {
+        // 1. Tạo một đơn hàng trước (để đảm bảo không bị lỗi khóa ngoại)
+        OrderDAO orderDao = new OrderDAO();
+        Orders order = new Orders();
+        UUID orderId = UUID.randomUUID();
+        order.setId(orderId);
+        order.setUserId(UUID.fromString("b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22")); // Seeded user
+        order.setCustomerName("Test OrderItem User");
+        order.setSubTotal(50000.0);
+        order.setTotalAmount(50000.0);
+        order.setStatus("PENDING");
+        orderDao.createOrder(order);
+
+        // 2. Thêm 1 OrderItem vào đơn hàng vừa tạo
+        OrderItemDAO itemDao = new OrderItemDAO();
+        OrderItems item = new OrderItems();
+        item.setOrderId(orderId);
+        item.setProductId(UUID.fromString("f1eebc99-9c0b-4ef8-bb6d-6bb9bd380f11")); // Seeded product
+        item.setSnapshotProductName("Espresso Test");
+        item.setQuantity(1);
+        item.setSnapshotUnitPrice(new BigDecimal("50000"));
+        item.setSubTotal(new BigDecimal("50000"));
+        item.setSnapshotOptions("No Sugar");
+
+        boolean result = itemDao.addOrderItem(item);
+        
+        Assert.assertTrue("Thêm OrderItem phải trả về true", result);
+        Assert.assertTrue("ID tự tăng của OrderItem phải > 0", item.getId() > 0);
+        
+        System.out.println(">>> [THÀNH CÔNG] Đã thêm thành công 1 OrderItem (ID = " + item.getId() + ") vào đơn hàng: " + orderId);
     }
 }

@@ -5,7 +5,7 @@ target-codex/
 # IDE files
 .idea/
 *.iml
-.vscode/
+# .vscode/ (Bỏ comment để push cấu hình settings.json và launch.json lên git cho team)
 *.classpath
 *.project
 .settings/
@@ -32,3 +32,5 @@ application-local.properties
 
 # Claude
 .claude/
+*.class
+sources.txt
